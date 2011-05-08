@@ -227,13 +227,13 @@ class Connection(object):
             res = self._HANDLERS[handler](self, *args)
         except KeyboardInterrupt:
             raise
-        except:
-            # need to catch old style exceptions too
-            t, v, tb = sys.exc_info()
-            self._last_traceback = tb
-            if t is SystemExit and self._config["propagate_SystemExit_locally"]:
-                raise
-            self._send_exception(seq, t, v, tb)
+        #except:
+        #    # need to catch old style exceptions too
+        #    t, v, tb = sys.exc_info()
+        #    self._last_traceback = tb
+        #    if t is SystemExit and self._config["propagate_SystemExit_locally"]:
+        #        raise
+        #    self._send_exception(seq, t, v, tb)
         else:
             self._send_reply(seq, res)
 

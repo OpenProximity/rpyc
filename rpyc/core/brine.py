@@ -274,11 +274,14 @@ def dump(obj):
     """dumps the given object to a byte-string representation"""
     stream = []
     _dump(obj, stream)
-    return "".join(stream)
+    data = "".join(stream)
+    print "DUMP", repr(obj), repr(data)
+    return data
 
 def load(data):
     """loads the given byte-string representation to an object"""
     stream = StringIO(data)
+    print "LOAD: ", repr(data)
     return _load(stream)
 
 simple_types = frozenset([type(None), int, long, bool, str, float, unicode,
