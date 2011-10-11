@@ -1,5 +1,7 @@
 import time
 
+RAISE_NON_HANDLED_EXCEPTION=False
+RAISE_EXPIRED=False
 
 class AsyncResultTimeout(Exception):
     """an exception that represents an :class:`AsyncResult` that has timed out"""
@@ -30,11 +32,14 @@ class AsyncResult(object):
         return "<AsyncResult object (%s) at 0x%08x>" % (state, id(self))
     
     def __call__(self, is_exc, obj):
-        if self.expired:
+        if self.expired and RAISE_EXPIRED:
+            raise obj
             return
         self._is_exc = is_exc
         self._obj = obj
         self._is_ready = True
+        if len(self._callbacks) == 0 and is_exc and RAISE_NON_HANDLED_EXCEPTION:
+            raise obj
         for cb in self._callbacks:
             cb(self)
         del self._callbacks[:]
