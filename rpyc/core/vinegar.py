@@ -21,7 +21,7 @@ except ImportError:
 
 from rpyc.core import brine
 from rpyc.core import consts
-from rpyc.lib.compat import is_py3k
+from rpyc.lib.compat import is_py3k, is_py27
 
 
 try:
@@ -73,6 +73,8 @@ def dump(typ, val, tb, include_local_traceback):
                 else:
                     args.append(repr(a))
         elif name.startswith("_") or name in ignored_attrs:
+            continue
+        elif name=="message" and is_py27:
             continue
         else:
             attrval = getattr(val, name)

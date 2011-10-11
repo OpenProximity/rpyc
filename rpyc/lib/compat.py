@@ -5,6 +5,7 @@ and various platforms (posix/windows)
 import sys
 
 is_py3k = (sys.version_info[0] >= 3)
+is_py27 = sys.version_info[:3] >= (2,7,0)
 
 if is_py3k:
     exec("execute = exec")
