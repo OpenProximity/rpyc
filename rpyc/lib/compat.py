@@ -133,4 +133,9 @@ else:
     
     poll = SelectingPoll
 
+class ByValWrapper(object):
+    "A simple wrapper class that allows to send objects by value instead of by reference"
+
+    def __init__(self, data=None):
+        self.data = data
 

@@ -18,9 +18,18 @@ Example::
     >>> z = load(y)
     >>> x == z
     True
-"""
-from rpyc.lib.compat import Struct, BytesIO, all, is_py3k, BYTES_LITERAL
+    >>> x = {'test1': 'hello world', 'test2': 'hello wordl2'}
+    >>> x1 = ByValWrapper(x)
+    >>> dumpable(x1)
+    True
+    >>> y = dump(x1)
+    >>> z = load(y)
+    >>> x == z
+    True
 
+"""
+from rpyc.lib.compat import Struct, BytesIO, all, is_py3k, BYTES_LITERAL, ByValWrapper
+from pickle import loads, dumps
 
 # singletons
 TAG_NONE = BYTES_LITERAL("\x00")
@@ -51,6 +60,7 @@ TAG_FLOAT = BYTES_LITERAL("\x18")
 TAG_SLICE = BYTES_LITERAL("\x19")
 TAG_FSET = BYTES_LITERAL("\x1a")
 TAG_COMPLEX = BYTES_LITERAL("\x1b")
+TAG_BYVAL = BYTES_LITERAL("\x1c")
 if is_py3k:
     IMM_INTS = dict((i, bytes([i + 0x50])) for i in range(-0x30, 0xa0))
 else:
@@ -196,6 +206,12 @@ def _dump_tuple(obj, stream):
     for item in obj:
         _dump(item, stream)
 
+@register(_dump_registry, ByValWrapper)
+def _dump_by_val(obj, stream):
+    stream.append(TAG_BYVAL)
+    _dump_str(dumps(obj.data), stream)
+
+
 def _undumpable(obj, stream):
     raise TypeError("cannot dump %r" % (obj,))
 
@@ -317,6 +333,11 @@ def _load_int_l4(stream):
     l, = I4.unpack(stream.read(4))
     return int(stream.read(l))
 
+@register(_load_registry, TAG_BYVAL)
+def _load_byval(stream):
+    obj = loads(_load(stream))
+    return obj
+
 def _load(stream):
     tag = stream.read(1)
     if tag in IMM_INTS_LOADER:
@@ -349,10 +370,10 @@ def load(data):
 
 if is_py3k:
     simple_types = frozenset([type(None), int, bool, float, bytes, str, 
-        slice, complex, type(NotImplemented), type(Ellipsis)])
+        slice, complex, type(NotImplemented), type(Ellipsis), ByValWrapper])
 else:
     simple_types = frozenset([type(None), int, long, bool, float, str, unicode,
-        slice, complex, type(NotImplemented), type(Ellipsis)])
+        slice, complex, type(NotImplemented), type(Ellipsis), ByValWrapper])
 
 def dumpable(obj):
     """Indicates whether the given object is *dumpable* by brine
