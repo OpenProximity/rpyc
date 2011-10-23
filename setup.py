@@ -13,9 +13,9 @@ if sys.version_info < (2, 4):
 here = os.path.dirname(__file__)
 exec(open(os.path.join(here, 'rpyc', 'version.py')).read())
 
-setup(name = "rpyc",
+setup(name = "rpyc-op",
     version = version_string, #@UndefinedVariable
-    description = "Remote Python Call (RPyC), a transparent and symmetric RPC library",
+    description = "Remote Python Call (RPyC), a transparent and symmetric RPC library modified for OpenProximity",
     author = "Tomer Filiba",
     author_email = "tomerfiliba@gmail.com",
     license = "MIT",
